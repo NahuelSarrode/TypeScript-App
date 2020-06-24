@@ -1,14 +1,40 @@
-import express from "express";
-import bodyParser from "body-parser";
-import { Request, Response } from "express";
+import express from "express"
+import bodyParser from "body-parser"
+import { Request, Response, Application } from "express"
+import morgan from 'morgan' 
 
-const app = express();
+// Routes 
+import indexRoutes from "./routes/index.routes";
+import postRoutes from "./routes/post.routes";
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/', (req: Request, res: Response) => res.send('Hello'))
+export class App {
 
-const PORT = process.env.PORT || 3000 
+    private app: Application
 
-app.listen(PORT, () => console.log(`Server running on port: ${PORT}`))
+    constructor(private port?: number | string) {
+        this.app = express()
+        this.settings()
+        this.middlewares()
+        this.routes()
+    }
+
+    settings() {
+        this.app.set('port', this.port || process.env.process || 3000)
+    }
+
+    middlewares() {
+        this.app.use(morgan('dev'))
+        this.app.use(express.json())
+    }
+
+    routes() {
+        this.app.use(indexRoutes)
+        this.app.use('/posts', postRoutes)
+    }
+
+    async listen() {
+        await this.app.listen(this.app.get('port'))
+        console.log('Server Running on port', this.app.get('port'))
+    }
+}
