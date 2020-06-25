@@ -20,7 +20,7 @@ export class App {
     }
 
     settings() {
-        this.app.set('port', this.port || process.env.process || 3000)
+        this.app.set('port', process.env.process || 4000)
     }
 
     middlewares() {
