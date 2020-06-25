@@ -25,7 +25,8 @@ export class App {
 
     middlewares() {
         this.app.use(morgan('dev'))
-        this.app.use(express.json())
+        this.app.use(bodyParser.urlencoded({ extended: false }))
+        this.app.use(bodyParser.json())
     }
 
     routes() {

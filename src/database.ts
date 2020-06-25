@@ -5,7 +5,7 @@ export async function connect() {
         database: 'node_mysql_ts',
         host: 'localhost',
         user: 'root',
-        password: 'voldemort1',
+        password: 'Voldemort1@',
         connectionLimit: 10
     })
 

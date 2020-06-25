@@ -7,7 +7,7 @@ router.route('/')
     .get(getPosts)
     .post(createPost)
 
-router.route('/:postId') 
+router.route('/:post_id') 
     .get(getPost)
     .delete(deletePost)
     .put(updatePost)

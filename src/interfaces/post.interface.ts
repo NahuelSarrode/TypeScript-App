@@ -3,5 +3,5 @@ export interface Post {
     title: string, 
     description: string, 
     image_url: string, 
-    created_at: Date
+    created_at?: Date
 }
