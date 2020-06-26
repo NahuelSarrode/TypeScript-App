@@ -3,12 +3,17 @@ import { Post } from "../interfaces/post.interface";
 import logger from "../common/logger";
 import { connect } from "../database"; 
 
+
+// TODO: resolver como transformar un objeto en array para poder verificar que el id exista. 
+// https://www.cloudhadoop.com/2018/08/typescript-how-to-convert-object-to.html
 export async function exist(params: string) {
     try {
+        var temp: Array<string> = []
         const conn = await connect()
-        const post = await conn.query("SELECT id FROM post WHERE id = ?", params)
-       
-        return post[0]
+        const [ post ] = await conn.query("SELECT id FROM post WHERE id = ?", params)
+        temp = Object.values(post)
+
+        return temp
     } catch (error) {
         logger.error("Cant get id", error)
         throw error
