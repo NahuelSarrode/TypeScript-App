@@ -3,7 +3,6 @@ import logger from "../common/logger";
 import { status } from "../config/http_constants"; 
 import { Post } from "../interfaces/post.interface";
 import * as postService from "../services/post.service";
-import { http } from "winston";
 
 export async function getPosts(req: Request, res: Response) {
     try {
@@ -31,13 +30,16 @@ export async function createPost(req: Request, res: Response) {
 export async function getPost(req: Request, res: Response) {
     try {
         const { post_id } = req.params
-        const exist = await postService.exist(post_id)
-        const post = await postService.getPostService(post_id) 
-        
-        if (post) {
+        const exist = await postService.exist(post_id) 
+
+        if (!exist) {
             res.sendStatus(status.BAD_REQUEST)
         }
+        console.log(exist)
+        const post = await postService.getPostService(post_id) 
+
         res.status(status.OK).json(post)
+        
     } catch (error) {
         logger.error("Error getting post by id" , error)
         res.sendStatus(status.INTERNAL_SERVER_ERROR)

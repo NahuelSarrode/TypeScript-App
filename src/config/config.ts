@@ -7,7 +7,7 @@ export const config = {
         host: 'localhost',
         user: 'root',
         database: 'node_mysql_ts',
-        password: 'voldemort1',
+        password: 'Voldemort1@',
     },
     email: {
         host: 'smtp.mailtrap.io',
