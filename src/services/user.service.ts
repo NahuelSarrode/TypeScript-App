@@ -40,8 +40,7 @@ export async function findOne(params: string) {
             .where("email = ?", params);
 
         const preparadQuery = query.toString(); 
-        const [ result ] = await pool.query(preparadQuery); 
-        const resolve = JSON.parse(JSON.stringify(result)); 
+        const [ result ] = await pool.query(preparadQuery);  
         
         const temp = Object.values(result); 
 
@@ -49,29 +48,49 @@ export async function findOne(params: string) {
             return null
         }
 
-        return resolve;
+        const user = JSON.parse(JSON.stringify(result));
+        
+        return user[0]; 
     } catch (error) {
         logger.error("cant execute query ", error);
         throw error; 
     }
 }
 
-export const checkCredentials = async (params: IUser) => {
+export const checkCredentials = async (pass: string, userPassword: string): Promise<boolean> => {
     try {
-        const query = squel.select()
-            .from("user")
-            .field("id")
-            .field("username")
-            .field("email")
-            .field("password")
-            .where("email = ?", params.email)
+        const result = await bcrypt.compare(pass, userPassword);
 
-        const preparadQuery = query.toString(); 
-        const [ result ] = await pool.query(preparadQuery); 
-
-        return JSON.parse(JSON.stringify(result));
+        return result;
     } catch (error) {
         logger.error("cant execute query ", error);
         throw error;   
     }    
+}
+
+export const findById = async (params: string) => {
+    try {
+        const query = squel.select() 
+            .from("user")
+            .field("username")
+            .field("email") 
+            .where("id = ?", params) 
+
+        const preparadQuery = query.toString(); 
+        const [ user ] = await pool.query(preparadQuery);
+        
+        // Verify if that user has a value. 
+        const temp = Object.values(user);
+        // if not return null. 
+        if (!temp || temp.length) {
+            return null
+        }
+
+        const result = JSON.parse(JSON.stringify(user));
+
+        return result[0]
+    } catch (error) {
+        logger.error("cant execute query ", error);
+        throw error; 
+    }
 }

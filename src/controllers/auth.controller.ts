@@ -1,3 +1,4 @@
+import express from "express";
 import { Request, Response } from "express";
 import bcryipt from "bcryptjs"; 
 import { IUser } from '../interfaces/user.interface';
@@ -8,6 +9,7 @@ import { User } from "../models/user.model";
 import logger from "../common/logger";
 import jwt from "jsonwebtoken";
 import { config } from "../config/config";
+import { stat } from "fs";
 
 // Terminar con los metodos de jwt. 
 export const signup = async (req: Request, res: Response) => {
@@ -39,19 +41,34 @@ export const signup = async (req: Request, res: Response) => {
         res.sendStatus(status.INTERNAL_SERVER_ERROR);
     }
 }
-// TODO terminar este metodo ya que no devuelve lo que deberìa,necesito poder acceder a user.password para comprarlo.
 
 export const signin = async (req: Request, res: Response) => {
     try {
         const user = await userService.findOne(req.body.email);
-        if (!user) return res.status(status.BAD_REQUEST).send("Email or password are wrong!"); 
-        console.log(user.email);
-        res.sendStatus(status.OK);
-    } catch (error) {
+        if (!user) return res.status(status.BAD_REQUEST).send("Email or password incorrect!"); 
+
+        const verify = await userService.checkCredentials(req.body.password, user.password);
+        if (verify === false) return res.status(status.BAD_REQUEST).send("Password inserted is incorrect!");
+
+        const token: string = jwt.sign({_id: user.id}, config.secret, {
+            expiresIn: "12h"
+        }); 
         
+        res.header("auth-token", token).json(user);
+    } catch (error) {
+        logger.error("Error saving user ", error);
+        res.sendStatus(status.INTERNAL_SERVER_ERROR);
     }
 }
 
-export const profile = (req: Request, res: Response) => {
-    
+export const profile = async (req: Request, res: Response) => {
+    try {
+        const user = await userService.findById(req.userId); 
+
+        if (!user) return res.status(status.BAD_REQUEST).send("User dont exist"); 
+        res.status(status.OK).json(user);
+    } catch (error) {
+        logger.error("Error Accessing to profile ", error);
+        throw error; 
+    }
 }
