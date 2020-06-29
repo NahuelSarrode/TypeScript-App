@@ -35,7 +35,6 @@ export async function getPost(req: Request, res: Response) {
         if (!exist) {
             res.sendStatus(status.BAD_REQUEST)
         }
-        console.log(exist)
         const post = await postService.getPostService(post_id) 
 
         res.status(status.OK).json(post)

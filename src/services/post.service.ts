@@ -1,13 +1,12 @@
 import { Request, Response } from "express";
 import { Post } from "../interfaces/post.interface";
 import logger from "../common/logger";
-import { connect } from "../database"; 
+import pool from "../database"; 
 
 export async function exist(params: string) {
     try {
         var temp: Array<string> = []
-        const conn = await connect()
-        const [ post ] = await conn.query("SELECT id FROM post WHERE id = ?", params)
+        const [ post ] = await pool.query("SELECT * FROM post WHERE id = ?", params)
     
         temp = Object.values(post)
 
@@ -23,9 +22,8 @@ export async function exist(params: string) {
 }
 
 export async function getPostsService() {
-    try {
-        const conn = await connect() 
-        const rows = await conn.query("SELECT * FROM post") 
+    try { 
+        const rows = await pool.query("SELECT * FROM post") 
 
         if (!rows || !rows.length) {
             return null
@@ -39,9 +37,8 @@ export async function getPostsService() {
 }
 
 export async function createPostService(params: Post) {
-    try {
-        const conn = await connect() 
-        const post = await conn.query("INSERT INTO post SET ?", params)
+    try { 
+        const post = await pool.query("INSERT INTO post SET ?", params)
         
         if (!post || !post.length) {
             return null
@@ -56,8 +53,8 @@ export async function createPostService(params: Post) {
 
 export async function getPostService(params: string) {
     try {
-        const conn = await connect()
-        const [result] = await conn.query('SELECT * FROM post WHERE id = ?', params) 
+
+        const [result] = await pool.query('SELECT * FROM post WHERE id = ?', params) 
 
         if (!result) {
             return null
@@ -72,8 +69,7 @@ export async function getPostService(params: string) {
 
 export async function deletePostService(params: string) {
     try {
-        const conn = await connect()
-        await conn.query("DELETE FROM post WHERE id = ?", params)
+        await pool.query("DELETE FROM post WHERE id = ?", params)
     } catch (error) {
         logger.error("Cant execute query ", error)
         throw error
@@ -82,8 +78,7 @@ export async function deletePostService(params: string) {
 
 export async function updatePostService(params_id: string, params: Post) {
     try {
-        const conn = await connect()
-        await conn.query('UPDATE post SET ? WHERE id = ?', [params, params_id])
+        await pool.query('UPDATE post SET ? WHERE id = ?', [params, params_id])
     } catch (error) {
         logger.error('Cant execute query', error)
         throw error
