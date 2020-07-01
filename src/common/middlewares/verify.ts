@@ -11,7 +11,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
     
     const payload = jwt.verify(token, config.secret) as IPayload;
 
-    req.userId = payload.id
+    // req.userId = payload.id
 
     next();
 }

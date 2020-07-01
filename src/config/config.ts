@@ -1,5 +1,5 @@
 export const config = {
-    port: 4000,
+    port: 3000,
     logLevel: 'debug',
     production: true, 
     secret: 'sectret', 

@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import squel from "squel";
 import { Post } from "../interfaces/post.interface";
 import logger from "../common/logger";
 import pool from "../database"; 
@@ -6,15 +7,26 @@ import pool from "../database";
 export async function exist(params: string) {
     try {
         var temp: Array<string> = []
-        const [ post ] = await pool.query("SELECT * FROM post WHERE id = ?", params)
+
+        const query = squel.select()
+            .from("post")
+            .field("id")
+            .field("title")
+            .field("description")
+            .field("image_url")
+            .field("created_at")
+            .where("id = ?", params); 
+
+        const prepraredQuery = query.toParam();
+        const [ row ] = await pool.query(prepraredQuery.text, prepraredQuery.values); 
     
-        temp = Object.values(post)
+        temp = Object.values(row)
 
         if (!temp || !temp.length) {
             return null
         }
 
-        return temp
+        return JSON.parse(JSON.stringify(row)); 
     } catch (error) {
         logger.error("Cant get id", error)
         throw error
@@ -23,13 +35,26 @@ export async function exist(params: string) {
 
 export async function getPostsService() {
     try { 
-        const rows = await pool.query("SELECT * FROM post") 
+        var verify: Array<string> = [];
 
-        if (!rows || !rows.length) {
-            return null
+        const query = squel.select()
+            .from("post")
+            .field("id")
+            .field("title")
+            .field("description")
+            .field("image_url")
+            .field("created_at");
+
+        const prepraredQuery = query.toParam();
+        const [ rows ] = await pool.query(prepraredQuery.text, prepraredQuery.values); 
+
+        verify = Object.values(rows);
+    
+        if (!verify || !verify.length) {
+            return null; 
         }
 
-        return rows[0]
+        return rows;
     } catch (error) {
         logger.error('Cant execute query ', error)
         throw error
@@ -38,29 +63,14 @@ export async function getPostsService() {
 
 export async function createPostService(params: Post) {
     try { 
-        const post = await pool.query("INSERT INTO post SET ?", params)
-        
-        if (!post || !post.length) {
-            return null
-        }
+        const query = squel.insert() 
+            .into("post")
+            .set("title", params.title)
+            .set("description", params.description)
+            .set("image_url", params.image_url)
 
-        return post.lastIndexOf
-    } catch (error) {
-        logger.error('Cant execute query ', error) 
-        throw error
-    }
-}
-
-export async function getPostService(params: string) {
-    try {
-
-        const [result] = await pool.query('SELECT * FROM post WHERE id = ?', params) 
-
-        if (!result) {
-            return null
-        }
-
-        return result
+        const prepraredQuery = query.toParam(); 
+        await pool.query(prepraredQuery.text, prepraredQuery.values);
     } catch (error) {
         logger.error('Cant execute query ', error) 
         throw error
@@ -69,7 +79,12 @@ export async function getPostService(params: string) {
 
 export async function deletePostService(params: string) {
     try {
-        await pool.query("DELETE FROM post WHERE id = ?", params)
+        const query = squel.delete() 
+            .from("post")
+            .where("id = ?", params);
+
+        const prepraredQuery = query.toParam(); 
+        await pool.query(prepraredQuery.text, prepraredQuery.values);
     } catch (error) {
         logger.error("Cant execute query ", error)
         throw error
@@ -78,7 +93,14 @@ export async function deletePostService(params: string) {
 
 export async function updatePostService(params_id: string, params: Post) {
     try {
-        await pool.query('UPDATE post SET ? WHERE id = ?', [params, params_id])
+        const query = squel.update()
+            .table("post")
+            .set("title", params.title)
+            .set("description", params.description)
+            .set("image_url", params.image_url)
+
+        const prepraredQuery = query.toParam();
+        await pool.query(prepraredQuery.text, prepraredQuery.values);
     } catch (error) {
         logger.error('Cant execute query', error)
         throw error
