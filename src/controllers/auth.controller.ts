@@ -9,7 +9,6 @@ import { User } from "../models/user.model";
 import logger from "../common/logger";
 import jwt from "jsonwebtoken";
 import { config } from "../config/config";
-import { stat } from "fs";
 
 // Terminar con los metodos de jwt. 
 export const signup = async (req: Request, res: Response) => {
@@ -61,12 +60,12 @@ export const signin = async (req: Request, res: Response) => {
     }
 }
 
-export const profile = async (req: Request, res: Response) => {
+export const profile = async (req: any, res: Response) => {
     try {
-        /* const user = await userService.findById(req.userId); 
+        const user = await userService.findById(req.userId); 
 
         if (!user) return res.status(status.BAD_REQUEST).send("User dont exist"); 
-        res.status(status.OK).json(user); */
+        res.status(status.OK).json(user);
     } catch (error) {
         logger.error("Error Accessing to profile ", error);
         throw error; 

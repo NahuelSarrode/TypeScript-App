@@ -1,9 +1,7 @@
-import { App } from "./app"
+import app from "./app"
 
-async function main() {
-    const app = new App() 
-
-    await app.listen()
+function main() { 
+    app.listen()
 }
 
 main()

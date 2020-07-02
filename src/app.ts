@@ -1,7 +1,6 @@
-import express from "express"
-import bodyParser from "body-parser"
-import { Application } from "express"
-import morgan from 'morgan'
+import express from "express";
+import bodyParser from "body-parser";
+import morgan from 'morgan';
 
 // Config constants
 import { config } from "./config/config"; 
@@ -11,39 +10,28 @@ import indexRoutes from "./routes/index.routes";
 import postRoutes from "./routes/post.routes";
 import authRoutes from "./routes/auth.routes";
 
+const app = express(); 
 
-export class App {
+// settings
+app.set('port', config.port || process.env.PORT || 3000);
 
-    private app: Application
+// middlewares 
+app.use(morgan('dev'));
+app.use(bodyParser.urlencoded({ 
+    limit: '50mb',
+    extended: false
+}));
 
-    constructor(private port?: number | string) {
-        this.app = express();
-        this.settings();
-        this.middlewares();
-        this.routes();
-    }
+app.use(bodyParser.json({
+    limit: '50mb'
+}));
 
-    settings() {
-        this.app.set('port', config.port || process.env.process || 3000);
-    }
+// routes 
+app.use(indexRoutes);
+app.use('/posts', postRoutes);
+app.use('/api/auth', authRoutes);
 
-    middlewares() {
-        this.app.use(morgan('dev'));
-        this.app.use(bodyParser.urlencoded({ 
-            limit: '50mb',
-            extended: false  
-        }))
-        this.app.use(bodyParser.json({limit: '50mb'}));
-    }
+app.listen(app.get('port'));
+console.log(`Server running on port ${app.get('port')}`) 
 
-    routes() {
-        this.app.use(indexRoutes);
-        this.app.use('/posts', postRoutes);
-        this.app.use('/api/auth', authRoutes);
-    }
-    // borré el async y await de la funcion para ver si esto genera el error al resetear el server. 
-    listen() {
-        this.app.listen(this.app.get('port'));
-        console.log('Server Running on port', config.port);
-    }
-}
+export default app; 
