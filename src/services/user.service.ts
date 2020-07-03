@@ -36,6 +36,7 @@ export async function findOne(params: string) {
             .field("id")
             .field("username")
             .field("email")
+            .field("role")
             .field("password")
             .where("email = ?", params);
 
@@ -74,21 +75,20 @@ export const findById = async (params: string) => {
             .from("user")
             .field("username")
             .field("email") 
+            .field("role")
             .where("id = ?", params) 
 
-        const preparadQuery = query.toString(); 
-        const [ user ] = await pool.query(preparadQuery);
+        const preparadQuery = query.toParam(); 
+        const [ user ] = await pool.query(preparadQuery.text, preparadQuery.values);
         
         // Verify if that user has a value. 
         const temp = Object.values(user);
         // if not return null. 
-        if (!temp || temp.length) {
+        if (!temp || !temp.length) {
             return null
         }
 
-        const result = JSON.parse(JSON.stringify(user));
-
-        return result[0]
+        return JSON.parse(JSON.stringify(user));
     } catch (error) {
         logger.error("cant execute query ", error);
         throw error; 

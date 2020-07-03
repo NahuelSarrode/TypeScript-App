@@ -10,7 +10,6 @@ import logger from "../common/logger";
 import jwt from "jsonwebtoken";
 import { config } from "../config/config";
 
-// Terminar con los metodos de jwt. 
 export const signup = async (req: Request, res: Response) => {
     try {
         // saving a new user
@@ -49,7 +48,7 @@ export const signin = async (req: Request, res: Response) => {
         const verify = await userService.checkCredentials(req.body.password, user.password);
         if (verify === false) return res.status(status.BAD_REQUEST).send("Password inserted is incorrect!");
 
-        const token: string = jwt.sign({_id: user.id}, config.secret, {
+        const token: string = jwt.sign({id: user.id}, config.secret, {
             expiresIn: "12h"
         }); 
         
@@ -63,7 +62,7 @@ export const signin = async (req: Request, res: Response) => {
 export const profile = async (req: any, res: Response) => {
     try {
         const user = await userService.findById(req.userId); 
-
+        
         if (!user) return res.status(status.BAD_REQUEST).send("User dont exist"); 
         res.status(status.OK).json(user);
     } catch (error) {

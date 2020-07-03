@@ -3,6 +3,7 @@ import logger from "../common/logger";
 import { status } from "../config/http_constants"; 
 import { Post } from "../interfaces/post.interface";
 import * as postService from "../services/post.service";
+import * as userService from "../services/user.service";
 
 export async function getPosts(req: Request, res: Response) {
     try {
@@ -15,9 +16,11 @@ export async function getPosts(req: Request, res: Response) {
     }
 }
 
-export async function createPost(req: Request, res: Response) {
+export async function createPost(req: any, res: Response) {
     try {
-        const newPost: Post = req.body
+        const newPost: Post = req.body; 
+        newPost.user_id = req.userId;
+
         await postService.createPostService(newPost)
 
         res.sendStatus(status.CREATED)
@@ -44,13 +47,19 @@ export async function getPost(req: Request, res: Response) {
     }
 }
 
-export async function deletePost(req: Request, res: Response) {
+export async function deletePost(req: any, res: Response) {
     try {
         const { post_id }   = req.params; 
         const post: Post = await postService.exist(post_id);
 
         if (!post) {
             res.status(status.BAD_REQUEST).send("Cant eliminate a post that not exist");
+        }
+
+        const user = req.userId;
+
+        if (user !== post.user_id) {
+            res.status(status.UNAUTHORIZED).send("An user can delete your own post, not from others users");
         }
     
         await postService.deletePostService(post_id);
@@ -62,7 +71,7 @@ export async function deletePost(req: Request, res: Response) {
     }
 }
 
-export async function updatePost(req: Request, res: Response) {
+export async function updatePost(req: any, res: Response) {
     try {
         const { post_id } = req.params
 
@@ -70,6 +79,14 @@ export async function updatePost(req: Request, res: Response) {
         
         if (!exist) {
             res.status(status.BAD_REQUEST).send("You are trying to update a post that not exist");
+        }
+
+        console.log(exist);
+
+        const user = req.userId;
+
+        if (user !== exist.user_id) {
+            res.status(status.UNAUTHORIZED).send("An user can update your own post");
         }
 
         const post: Post = req.body 

@@ -9,13 +9,15 @@ export async function exist(params: string) {
         var temp: Array<string> = []
 
         const query = squel.select()
-            .from("post")
-            .field("id")
-            .field("title")
-            .field("description")
-            .field("image_url")
-            .field("created_at")
-            .where("id = ?", params); 
+            .from("post", "p")
+            .field("p.id")
+            .field("p.title")
+            .field("p.description")
+            .field("p.image_url")
+            .field("p.created_at")
+            .field("u.id", "user_id")
+            .join("user", "u", "p.user_id = u.id")
+            .where("p.id = ?", params); 
 
         const prepraredQuery = query.toParam();
         const [ row ] = await pool.query(prepraredQuery.text, prepraredQuery.values); 
@@ -26,7 +28,9 @@ export async function exist(params: string) {
             return null
         }
 
-        return JSON.parse(JSON.stringify(row)); 
+        const exist = JSON.parse(JSON.stringify(row));
+
+        return exist[0];
     } catch (error) {
         logger.error("Cant get id", error)
         throw error
@@ -38,12 +42,14 @@ export async function getPostsService() {
         var verify: Array<string> = [];
 
         const query = squel.select()
-            .from("post")
-            .field("id")
-            .field("title")
-            .field("description")
-            .field("image_url")
-            .field("created_at");
+            .from("post", "p")
+            .field("p.id")
+            .field("p.title")
+            .field("p.description")
+            .field("p.image_url")
+            .field("p.created_at")
+            .field("u.username")
+            .join("user", "u", "p.user_id = u.id");
 
         const prepraredQuery = query.toParam();
         const [ rows ] = await pool.query(prepraredQuery.text, prepraredQuery.values); 
@@ -67,6 +73,7 @@ export async function createPostService(params: Post) {
             .into("post")
             .set("title", params.title)
             .set("description", params.description)
+            .set("user_id", params.user_id)
             .set("image_url", params.image_url)
 
         const prepraredQuery = query.toParam(); 
@@ -98,6 +105,7 @@ export async function updatePostService(params_id: string, params: Post) {
             .set("title", params.title)
             .set("description", params.description)
             .set("image_url", params.image_url)
+            .where("id = ?", params_id); 
 
         const prepraredQuery = query.toParam();
         await pool.query(prepraredQuery.text, prepraredQuery.values);

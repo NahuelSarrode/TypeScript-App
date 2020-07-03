@@ -4,7 +4,7 @@ import { status } from "../../config/http_constants";
 import { config } from "../../config/config";
 import { IPayload } from "../../interfaces/payload.interface";
 
-export const verifyToken = (req: any, res: Response, next: NextFunction) => {
+export const isLogin = (req: any, res: Response, next: NextFunction) => {
     const token = req.header("auth-token");
 
     if (!token) return res.status(status.UNAUTHORIZED).send("Access Denied!"); 

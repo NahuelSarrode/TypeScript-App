@@ -9,6 +9,7 @@ import { config } from "./config/config";
 import indexRoutes from "./routes/index.routes";
 import postRoutes from "./routes/post.routes";
 import authRoutes from "./routes/auth.routes";
+import commentRoutes from "./routes/comment.routes";
 
 const app = express(); 
 
@@ -30,6 +31,7 @@ app.use(bodyParser.json({
 app.use(indexRoutes);
 app.use('/posts', postRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/comments/posts', commentRoutes);
 
 app.listen(app.get('port'));
 console.log(`Server running on port ${app.get('port')}`) 
