@@ -34,6 +34,6 @@ app.use('/api/auth', authRoutes);
 app.use('/comments/posts', commentRoutes);
 
 app.listen(app.get('port'));
-console.log(`Server running on port ${app.get('port')}`) 
+console.log(`Server running on port ${app.get('port')}`); 
 
 export default app; 

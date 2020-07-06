@@ -29,9 +29,8 @@ export const createComment = async (req: Request, res: Response) => {
     try {
         const { post_id } = req.params;
         const newComment: IComment = req.body; 
-
         const post = await postService.exist(post_id)
-
+        
         if (!post) return res.status(status.BAD_REQUEST).send("The Id post inserted are incorrect"); 
 
         const result = await commentService.createComment(post_id, newComment);
@@ -40,5 +39,78 @@ export const createComment = async (req: Request, res: Response) => {
     } catch (error) {
         logger.error("Error Getting comments", error);
         throw error;
+    }
+}
+
+export const getById = async (req: Request, res: Response) => {
+    try {
+        const { post_id, comment_id } = req.params; 
+
+        const post = await postService.exist(post_id);
+
+        if (!post) { 
+            res.status(status.BAD_REQUEST).send("this post not exist"); 
+        }
+
+        const comment = await commentService.getById(comment_id);
+
+        if (!comment) {
+            res.status(status.BAD_REQUEST).send("Dont exist these coment on the post selected");
+        }
+
+        res.status(status.OK).json(comment);
+    } catch (error) {
+        logger.error("Error Getting comments", error);
+        throw error;
+    }
+}
+
+export const deleteComment = async (req: Request, res: Response) => {
+    try {
+        const { post_id, comment_id } = req.params; 
+
+        const post = await postService.exist(post_id);
+
+        if (!post) {
+            res.status(status.BAD_REQUEST).send("This post dont exist"); 
+        }
+
+        const comment = await commentService.getById(comment_id); 
+        
+        if (!comment) {
+            res.status(status.BAD_REQUEST).send("This comment dont exist");
+        }
+
+        await commentService.deleteComment(post_id, comment_id);
+
+        res.sendStatus(status.OK);
+    } catch (error) {
+        logger.error("Error deleting the comment ", error);
+        throw error;
+    }
+}
+
+export const updateComment = async (req: Request, res: Response) => {
+    try {
+        const { post_id, comment_id } = req.params; 
+        const post = await postService.exist(post_id);
+
+        if (!post) return res.status(status.BAD_REQUEST).send("This post dont exist");
+
+        const comment = await commentService.getById(comment_id);
+        
+        if (!comment) return res.status(status.BAD_REQUEST).send("This comment dont exist"); 
+        
+        const updcomment: IComment = req.body;
+        updcomment.post_id = post_id; 
+        updcomment.id = comment_id;
+
+        await commentService.updateComment(updcomment);
+
+        res.sendStatus(status.OK);
+
+    } catch (error) {
+        logger.error("Error deleting comment", error);
+        throw error; 
     }
 }
