@@ -4,7 +4,6 @@ import { status } from "../config/http_constants";
 import * as postService from "../services/post.service";
 import * as commentService from "../services/comment.service";
 import { IComment } from "../interfaces/comment.interface";
-import { stat } from "fs/promises";
 
 
 export const getAll = async (req: Request, res: Response) => {
@@ -25,10 +24,12 @@ export const getAll = async (req: Request, res: Response) => {
     }
 }
 
-export const createComment = async (req: Request, res: Response) => {
+export const createComment = async (req: any, res: Response) => {
     try {
         const { post_id } = req.params;
         const newComment: IComment = req.body; 
+        newComment.user_id = req.userId;
+
         const post = await postService.exist(post_id)
         
         if (!post) return res.status(status.BAD_REQUEST).send("The Id post inserted are incorrect"); 
@@ -65,12 +66,12 @@ export const getById = async (req: Request, res: Response) => {
     }
 }
 
-export const deleteComment = async (req: Request, res: Response) => {
+export const deleteComment = async (req: any, res: Response) => {
     try {
         const { post_id, comment_id } = req.params; 
 
         const post = await postService.exist(post_id);
-
+        
         if (!post) {
             res.status(status.BAD_REQUEST).send("This post dont exist"); 
         }
@@ -81,6 +82,11 @@ export const deleteComment = async (req: Request, res: Response) => {
             res.status(status.BAD_REQUEST).send("This comment dont exist");
         }
 
+        // This function verify that the user only can delete your own comments.
+        const verify = await verifyUser(comment.user_id, req.userId);
+
+        if (verify == false) return res.sendStatus(status.UNAUTHORIZED);
+        
         await commentService.deleteComment(post_id, comment_id);
 
         res.sendStatus(status.OK);
@@ -90,7 +96,7 @@ export const deleteComment = async (req: Request, res: Response) => {
     }
 }
 
-export const updateComment = async (req: Request, res: Response) => {
+export const updateComment = async (req: any, res: Response) => {
     try {
         const { post_id, comment_id } = req.params; 
         const post = await postService.exist(post_id);
@@ -105,6 +111,11 @@ export const updateComment = async (req: Request, res: Response) => {
         updcomment.post_id = post_id; 
         updcomment.id = comment_id;
 
+        // This function verify that the user only can delete your own comments.
+        const verify = await verifyUser(comment.user_id, req.userId);
+
+        if (verify == false) return res.sendStatus(status.UNAUTHORIZED);
+
         await commentService.updateComment(updcomment);
 
         res.sendStatus(status.OK);
@@ -113,4 +124,10 @@ export const updateComment = async (req: Request, res: Response) => {
         logger.error("Error deleting comment", error);
         throw error; 
     }
+}
+
+const verifyUser = async (comment_user_id: string, user_id: string): Promise<Boolean> => {
+    if (comment_user_id === user_id) return true; 
+
+    return false;
 }

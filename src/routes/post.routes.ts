@@ -1,11 +1,12 @@
 import { Router } from "express";
 import { getPosts, createPost, getPost, deletePost, updatePost } from "../controllers/post.controller"; 
 import { isLogin } from "../common/middlewares/verify";
+import { isAdmin } from "../common/middlewares/isAdmin"; 
 
 const router = Router()
 
 router.route('/')
-    .get(isLogin, getPosts)
+    .get(isLogin, isAdmin, getPosts)
     .post(isLogin, createPost)
 
 router.route('/:post_id') 

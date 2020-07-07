@@ -30,14 +30,13 @@ export const getAll = async (params: string) => {
     }
 }
 
-// TODO: vincular al usuario id en el registro guardado, por ahora está harcodeado. 
 export const createComment = async (post: string, params: IComment) => {
     try {
         const query = squel.insert()
             .into("comment")
             .set("post_id", post)
             .set("text", params.text)
-            .set("user_id", 1)
+            .set("user_id", params.user_id)
             .set("image_url", params.image_url);
 
         const preparedQuery = query.toParam(); 

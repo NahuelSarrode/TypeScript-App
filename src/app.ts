@@ -6,7 +6,6 @@ import morgan from 'morgan';
 import { config } from "./config/config"; 
 
 // Routes 
-import indexRoutes from "./routes/index.routes";
 import postRoutes from "./routes/post.routes";
 import authRoutes from "./routes/auth.routes";
 import commentRoutes from "./routes/comment.routes";
@@ -28,7 +27,6 @@ app.use(bodyParser.json({
 }));
 
 // routes 
-app.use(indexRoutes);
 app.use('/posts', postRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/comments/posts', commentRoutes);

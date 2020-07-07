@@ -1,5 +1,4 @@
 import { IUser } from "../interfaces/user.interface";
-import { config } from "../config/config";
 import pool from "../database"; 
 import logger from "../common/logger";
 import squel from "squel";
@@ -87,10 +86,36 @@ export const findById = async (params: string) => {
         if (!temp || !temp.length) {
             return null
         }
+        
+        const result = JSON.parse(JSON.stringify(user));
 
-        return JSON.parse(JSON.stringify(user));
+        return result[0];
     } catch (error) {
         logger.error("cant execute query ", error);
+        throw error; 
+    }
+}
+
+export const getAll = async () => {
+    try {
+        const query = squel.select()
+            .from("user")
+            .field("id")
+            .field("username")
+            .field("email")
+        
+        const preparadQuery = query.toParam();
+        const [ rows ] = await pool.query(preparadQuery.text, preparadQuery.values);
+
+        const temp = Object.values(rows); 
+
+        if (!temp || !temp.length) {
+            return null;
+        }
+
+        return JSON.parse(JSON.stringify(rows));
+    } catch (error) {
+        logger.error("Cant execute query ", error); 
         throw error; 
     }
 }

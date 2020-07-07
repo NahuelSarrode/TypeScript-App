@@ -28,7 +28,7 @@ export const signup = async (req: Request, res: Response) => {
         const insertId = saved.insertId;
 
         // token
-        const token: string = jwt.sign({_id: insertId}, config.secret); 
+        const token: string = jwt.sign({id: insertId}, config.secret); 
         
         res.header("auth-token", token).json({
             insertId,
