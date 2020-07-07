@@ -1,45 +1,64 @@
-**Edit a file, create a new file, and clone from Bitbucket in under 2 minutes**
+# Mysql_node_jwt Proyect. 
 
-When you're done, you can delete the content in this README and update the file with details for others getting started with your repository.
+This API allow you create, edit, show and delete posts, also the users can create, edit, delete and show your own comments and posts. Also you can create a new user, login with your credentials and test de api. The admin have full access of all data, but normal users only can see, create update and delete your own data. 
 
-*We recommend that you open this README in another tab as you perform the tasks below. You can [watch our video](https://youtu.be/0ocf7u76WSo) for a full demo of all the steps in this tutorial. Open the video in a new tab to avoid leaving Bitbucket.*
+In the root folder you'll find POSTMAN or INSOMNIA collection and the Mysql migration with test data. 
 
----
 
-## Edit a file
+## Proyect Initialization
 
-You’ll start by editing this README file to learn how to edit a file in Bitbucket.
+### Install all dependencies: 
 
-1. Click **Source** on the left side.
-2. Click the README.md link from the list of files.
-3. Click the **Edit** button.
-4. Delete the following text: *Delete this line to make a change to the README from Bitbucket.*
-5. After making your change, click **Commit** and then **Commit** again in the dialog. The commit page will open and you’ll see the change you just made.
-6. Go back to the **Source** page.
 
----
+```bash
+npm i
+```
 
-## Create a file
+### Create a .config file: 
 
-Next, you’ll add a new file to this repository.
+```bash
+You must create a .config file on a config folder, in this folder you'll find a .config.example.
+```
 
-1. Click the **New file** button at the top of the **Source** page.
-2. Give the file a filename of **contributors.txt**.
-3. Enter your name in the empty file space.
-4. Click **Commit** and then **Commit** again in the dialog.
-5. Go back to the **Source** page.
+## Run Aplication:
 
-Before you move on, go ahead and explore the repository. You've already seen the **Source** page, but check out the **Commits**, **Branches**, and **Settings** pages.
+```python
+npm run dev
+```
 
----
+## Implemented Technologies: 
 
-## Clone a repository
+```python
+Mysql to save de data. 
+Express framework for the API. 
+Async/Await for handler async functions. 
+Winston for log system. 
+JsonWebToken for authentication system. 
+Squel query builder to make dinamics querys.
+```
 
-Use these steps to clone from SourceTree, our client for using the repository command-line free. Cloning allows you to work on your files locally. If you don't yet have SourceTree, [download and install first](https://www.sourcetreeapp.com/). If you prefer to clone from the command line, see [Clone a repository](https://confluence.atlassian.com/x/4whODQ).
+## API endpoints: 
 
-1. You’ll see the clone button under the **Source** heading. Click that button.
-2. Now click **Check out in SourceTree**. You may need to create a SourceTree account or log in.
-3. When you see the **Clone New** dialog in SourceTree, update the destination path and name if you’d like to and then click **Clone**.
-4. Open the directory you just created to see your repository’s files.
+# Posts: 
+```python
+Get All: return all posts saved on a database. 
+Get By Id: return a post for id asigned. 
+CreatePost: saved a post on database. 
+UpdatePost: An user can update an post. 
+Eliminate Post: You can delete a post saved. 
+```
 
-Now that you're more familiar with your Bitbucket repository, go ahead and add a new file locally. You can [push your change back to Bitbucket with SourceTree](https://confluence.atlassian.com/x/iqyBMg), or you can [add, commit,](https://confluence.atlassian.com/x/8QhODQ) and [push from the command line](https://confluence.atlassian.com/x/NQ0zDQ).
+# Comments: 
+```python
+Get All: return all comments from a post. 
+Get By Id: return a specific comment for a post. 
+CreateComment: saved a comment on database. 
+UpdateComment: An user can update your own comments. 
+EliminateCommnet: the user can delete only your comments.  
+```
+# Auth: 
+```python
+Signup: Allow to an user create a new acount into the system and create a jwt.
+Signin: The user can login into system with username, email and password.  
+Profile: Validate that password, email and token that correspond with the user. 
+```
